@@ -261,6 +261,91 @@ def gray_to_rgb(image_path: str):
     
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+
+def convert_gray_pixel(pixel_value):
+    if pixel_value < 32:
+        r = 0
+        g = 0
+        b = 255
+    elif 32 <= pixel_value < 64:
+        r = 0
+        g = int(255 * ((pixel_value - 32) / 31))
+        b = 255
+    elif 64 <= pixel_value < 128:
+        r = 0
+        g = 255
+        b = 255 - int(255 * ((pixel_value - 64) / 63))
+    else:
+        r = 255
+        g = 0
+        b = 0
+
+    return r, g, b
+
+
+def convert_gray_pixel_v2(pixel_value):
+    if pixel_value < 32:  # 0-31 -> Blue
+        r = 0
+        g = 0
+        b = 255  # Full blue
+    elif 32 <= pixel_value < 64:  # 32-63 -> Cyan
+        r = 0
+        g = int(255 * ((pixel_value - 32) / 31))  # Increase green
+        b = 255  # Blue stays full
+    elif 64 <= pixel_value < 96:  # 64-95 -> Green
+        r = 0
+        g = 255  # Full green
+        b = 255 - int(255 * ((pixel_value - 64) / 31))  # Decrease blue
+    elif 96 <= pixel_value < 128:  # 96-127 -> Yellow
+        r = int(255 * ((pixel_value - 96) / 31))  # Increase red
+        g = 255  # Green stays full
+        b = 0  # Blue off
+    elif 128 <= pixel_value < 160:  # 128-159 -> Orange
+        r = 255  # Full red
+        g = 255 - int(255 * ((pixel_value - 128) / 31))  # Decrease green
+        b = 0  # Blue off
+    elif 160 <= pixel_value < 192:  # 160-191 -> Red
+        r = 255  # Full red
+        g = 0  # Green off
+        b = 0  # Blue off
+    elif 192 <= pixel_value < 224:  # 192-223 -> Magenta
+        r = 255  # Full red
+        g = 0  # Green off
+        b = int(255 * ((pixel_value - 192) / 31))  # Increase blue
+    else:  # 224-255 -> White
+        r = 255  # Full red
+        g = 255  # Full green
+        b = 255  # Full blue
+
+    return r, g, b
+
+
+def gray_to_rgb_manual(image_path: str):
+    """
+    0 - 31 -> Blue
+    32 - 63 -> Cyan
+    64 - 127 -> Green
+    128 - 255 -> Red
+    """
+    gray_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    h, w = gray_image.shape
+
+    rgb_image = np.zeros((h, w, 3), dtype=np.uint8)
+    rgb_image_v2 = np.zeros((h, w, 3), dtype=np.uint8)
+
+
+    for i in range(h):
+        for j in range(w):
+            rgb_image[i, j] = convert_gray_pixel(gray_image[i, j])
+            rgb_image_v2[i, j] = convert_gray_pixel_v2(gray_image[i, j])
+
+    cv2.imshow('Original', gray_image)
+    cv2.imshow('Custom RGB V1', rgb_image)
+    cv2.imshow('Custom RGB V2', rgb_image_v2)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
     
     
 # simple_average_grayscale('E:\Master\ComputerVision\Week2\colored.jpg')
@@ -271,5 +356,7 @@ def gray_to_rgb(image_path: str):
 # custom_number_of_shades('E:\Master\ComputerVision\Week2\colored.jpg', 8, False)
 # floyd_steinberg_dither('E:\Master\ComputerVision\Week2\colored.jpg', 8)
 # stucki_dither('E:\Master\ComputerVision\Week2\colored.jpg', 8)
+# gray_to_rgb('E:\Master\ComputerVision\Week2\colored.jpg')
+gray_to_rgb_manual('E:\Master\ComputerVision\Week2\colored.jpg')
 gray_to_rgb('E:\Master\ComputerVision\Week2\colored.jpg')
     
