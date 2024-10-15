@@ -253,17 +253,9 @@ def stucki_dither(image_path: str, num_shades: int):
 Convert grayscale to RGB
 """
 def gray_to_rgb(image_path: str):
-    image = cv2.imread(image_path)
-    gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-    
-    height, width = gray_image.shape
-    rgb_image = np.zeros((height, width, 3), dtype=np.uint8)
-    
-    for i in range(height):
-        for j in range(width):
-            gv = gray_image[i, j]
-            rgb_image[i, j] = [gv, gv, gv]
-            
+    gray_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    rgb_image = cv2.applyColorMap(gray_image, cv2.COLORMAP_JET)
+
     cv2.imshow('Grayscale Image', gray_image)
     cv2.imshow('RGB Image', rgb_image)
     
