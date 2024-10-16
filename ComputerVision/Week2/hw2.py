@@ -22,7 +22,7 @@ def simple_average_grayscale(image_path: str):
     cv2.imshow('Original Image', image)
     cv2.imshow('Grayscale Image (Per Pixel)', gray_image)
     cv2.imshow('Grayscale other method', gray_image_different_method)
-    
+
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     
@@ -133,7 +133,7 @@ Custom Number of Grey Shades
 """
 def custom_number_of_shades(image_path: str, shades: int, equal_intervals: bool):
     image = cv2.imread(image_path)
-    grayscale_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    grayscale_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     
     if equal_intervals:
         a = np.linspace(0, 255, shades + 1, dtype=int)
@@ -159,22 +159,20 @@ def custom_number_of_shades(image_path: str, shades: int, equal_intervals: bool)
 """
 Custom numbers of grey shades - Floyd-Steinberg
 """
-def floyd_steinberg_dither(image_path: str, shades: int):
-    image = cv2.imread(image_path)
-    grayscale_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
-    height, width = grayscale_image.shape
+def floyd_steinberg_dither(image_path: str):
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    grayscale_image = image.astype(np.float32)
 
-    scale_factor = 255 / (shades - 1)
-    
+    height, width = image.shape[:2]
+
     for y in range(height):
         for x in range(width):
             old_pixel = grayscale_image[y, x]
-            
-            new_pixel = round(old_pixel / scale_factor) * scale_factor
-            grayscale_image[y, x] = new_pixel
-            
-            error = old_pixel - new_pixel
+
+            new_value = 0 if old_pixel < 128 else 255
+            grayscale_image[y, x] = new_value
+
+            error = old_pixel - new_value
 
             if x + 1 < width:
                 grayscale_image[y, x + 1] = np.clip(grayscale_image[y, x + 1] + error * 7 / 16, 0, 255)
@@ -195,23 +193,21 @@ def floyd_steinberg_dither(image_path: str, shades: int):
 """
 Custom number of grey shades - Stucki
 """    
-def stucki_dither(image_path: str, num_shades: int):
-    image = cv2.imread(image_path)
+def stucki_dither(image_path: str):
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     
-    grayscale_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    grayscale_image = image.astype(np.float32)
 
     height, width = grayscale_image.shape
-
-    scale_factor = 255 / (num_shades - 1)
 
     for y in range(height):
         for x in range(width):
             old_pixel = grayscale_image[y, x]
-            
-            new_pixel = round(old_pixel / scale_factor) * scale_factor
-            grayscale_image[y, x] = new_pixel
-            
-            error = old_pixel - new_pixel
+
+            new_value = 0 if old_pixel < 128 else 255
+            grayscale_image[y, x] = new_value
+
+            error = old_pixel - new_value
 
             # Right (x + 1)
             if x + 1 < width:
@@ -350,13 +346,15 @@ def gray_to_rgb_manual(image_path: str):
     
 # simple_average_grayscale('E:\Master\ComputerVision\Week2\colored.jpg')
 # weighted_average('E:\Master\ComputerVision\Week2\colored.jpg')
+# weighted_average('E:\Master\ComputerVision\Week2\\v2.jpg')
 # desaturation('E:\Master\ComputerVision\Week2\colored.jpg')
 # decomposition('E:\Master\ComputerVision\Week2\colored.jpg')
 # single_colour_channel('E:\Master\ComputerVision\Week2\colored.jpg')
 # custom_number_of_shades('E:\Master\ComputerVision\Week2\colored.jpg', 8, False)
-# floyd_steinberg_dither('E:\Master\ComputerVision\Week2\colored.jpg', 8)
-# stucki_dither('E:\Master\ComputerVision\Week2\colored.jpg', 8)
+# custom_number_of_shades('E:\Master\ComputerVision\Week2\\v2.jpg', 8, False)
+# floyd_steinberg_dither('E:\Master\ComputerVision\Week2\\v2.jpg')
+# stucki_dither('E:\Master\ComputerVision\Week2\\v2.jpg')
 # gray_to_rgb('E:\Master\ComputerVision\Week2\colored.jpg')
-gray_to_rgb_manual('E:\Master\ComputerVision\Week2\colored.jpg')
+# gray_to_rgb_manual('E:\Master\ComputerVision\Week2\colored.jpg')
 gray_to_rgb('E:\Master\ComputerVision\Week2\colored.jpg')
     

@@ -23,9 +23,9 @@ def display_image_data(image_path: str):
 def apply_filters_on_image(image_path: str):
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
     blur_kernel = np.ones((5, 5), np.float32) / 25
-    sharpen_kernel = np.array([[-1,-1,-1], 
-                               [-1, 9,-1],
-                               [-1,-1,-1]])
+    sharpen_kernel = np.array([[0,-1,0],
+                               [-1, 5,-1],
+                               [0,-1,0]])
     
     cv2.imshow('Normal', image)
     
@@ -33,7 +33,10 @@ def apply_filters_on_image(image_path: str):
     cv2.imshow('Blurred', blurred_image)
 
     sharpened_image = cv2.filter2D(src=image, ddepth=-1, kernel=sharpen_kernel)
-    cv2.imshow('Sharpened', sharpened_image)    
+    cv2.imshow('Sharpened', sharpened_image)
+
+    gaussian_blur_image = cv2.GaussianBlur(image,(5,5),0)
+    cv2.imshow('Gaussian Blur', gaussian_blur_image)
     
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -90,6 +93,14 @@ def crop_image(image_path: str,
     cv2.imshow('Normal', image)
     
     print(image.shape[:2])
+
+    (height, width) = image.shape[:2]
+    if (starting_point_coordinates[0] < 0 or
+            starting_point_coordinates[0] > width or
+            starting_point_coordinates[1] < 0 or
+            starting_point_coordinates[1] > height):
+        print("Wrong values given for the starting point. Out of bounds!")
+        return
     
     cropped_image = image[starting_point_coordinates[0]: starting_point_coordinates[0] + rectangle_length,
                           starting_point_coordinates[1]: starting_point_coordinates[1] + rectangle_width]
@@ -137,5 +148,5 @@ file_path: str = "E:\Master\ComputerVision\Week1\lena.tif"
 # apply_filters_on_image(file_path)
 # apply_custom_filter(file_path)
 # rotate_image(file_path)
-# crop_image(file_path, (0, 100), 256, 256)
+crop_image(file_path, (0, 100), 256, 256)
 # create_emoticon()
