@@ -1,4 +1,4 @@
-1) ADAM LR = 0.005 >> 51%
-2) Adagrad LR = 0.01 >> 52%
-3) SGD LR = 0.1 >> 60.33%
-4) SGD LR = 0.1%, RandomRotation, RandomFlip, ColorJitter, RandomErasing, RandomGrayscale
+1) ADAM LR = 0.005 >> 51% -- https://github.com/ValyIstrate/Master/blob/nn/hw2/AdvancedNeuralNetworks/homework2/first_try/FirstTry.ipynb
+2) Adagrad LR = 0.01 >> 52% -- https://github.com/ValyIstrate/Master/blob/nn/hw2/AdvancedNeuralNetworks/homework2/second_try/baseline-submission.ipynb
+3) SGD LR = 0.1 >> 60.33% -- https://github.com/ValyIstrate/Master/blob/nn/hw2/AdvancedNeuralNetworks/homework2/third_try/SGD.ipynb
+4) SGD LR = 0.1%, RandomRotation, RandomFlip, ColorJitter, RandomErasing, RandomGrayscale -- https://github.com/ValyIstrate/Master/blob/nn/hw2/AdvancedNeuralNetworks/homework2/fourth_try/baseline-submission.ipynb
