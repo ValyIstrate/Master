@@ -18,13 +18,14 @@ ex2 = function(n) {
     y = dbinom(x, size = n, prob = p)
     
     plot(x, y, type = "h", col = "blue", lwd = 2, 
-         main = paste("Distributia binomiala B(", n, ",", p, ")"),
-         xlab = "Valori ale lui x", ylab = "Probabilitate")
+         main = paste("D-Binom B(", n, ",", p, ")"),
+         xlab = "Values of X", ylab = "Prob")
     
     dev.off()
   }
 }
 
+# Run with: ex3(0, c(0.5, 1, 2))
 ex3 = function(mu, sigma_values) {
   x = seq(-7, 7, length.out = 1000)
   
@@ -32,14 +33,14 @@ ex3 = function(mu, sigma_values) {
   
   plot(x, dnorm(x, mean = mu, sd = sigma_values[1]), type = "l", col = colors[1], 
        lwd = 2, ylim = c(0, 1), 
-       main = expression(paste("Densitatea normala N(", mu, ", ", sigma^2, ") pentru diferite valori ale ", sigma)),
-       xlab = "x", ylab = "Densitate")
+       main = expression(paste("Normal Density N(", mu, ", ", sigma^2, ") for diferent values of ", sigma)),
+       xlab = "x", ylab = "Density")
   
   for (i in 2:length(sigma_values)) {
     lines(x, dnorm(x, mean = mu, sd = sigma_values[i]), col = colors[i], lwd = 2)
   }
   
-  legend("topright", legend = paste("σ =", sigma_values), col = colors, lwd = 2)
+  legend("topright", legend = paste("sigma =", sigma_values), col = colors, lwd = 2)
 }
 
 ### Exercitiul 4 a)
@@ -58,21 +59,18 @@ CLT = function(n) {
 ex4_1 = function() {
   par(mfrow = c(2, 2))
   
-  hist(CLT(1), main = "Histograma mediilor, n = 1", xlab = "Medii", col = "lightblue", breaks = 20)
-  
-  hist(CLT(5), main = "Histograma mediilor, n = 5", xlab = "Medii", col = "lightgreen", breaks = 20)
-  
-  hist(CLT(10), main = "Histograma mediilor, n = 10", xlab = "Medii", col = "lightcoral", breaks = 20)
-  
-  hist(CLT(100), main = "Histograma mediilor, n = 100", xlab = "Medii", col = "lightgoldenrod", breaks = 20)
+  hist(CLT(1), main = "Mean Histogram, n = 1", xlab = "Means", col = "lightblue", breaks = 20)
+  hist(CLT(5), main = "Mean Histogram, n = 5", xlab = "Means", col = "lightgreen", breaks = 20)
+  hist(CLT(10), main = "Mean Histogram, n = 10", xlab = "Means", col = "lightcoral", breaks = 20)
+  hist(CLT(100), main = "Mean Histogram, n = 100", xlab = "Means", col = "lightgoldenrod", breaks = 20)
 }
 
 ### Exercitiul 4 c)
-CLT_binom = function(n, size, prob) {
+CLT_binom = function(n) {
   sample_means = numeric(1000)
   
   for (i in 1:1000) {
-    sample = rbinom(n, size = size, prob = prob)
+    sample = rbinom(n, size = 20, prob = 0.9)
     sample_means[i] = mean(sample)
   }
   
@@ -82,11 +80,8 @@ CLT_binom = function(n, size, prob) {
 ex4_2 = function() {
   par(mfrow = c(2, 2))
   
-  hist(CLT_binom(1, 20, 0.5), main = "Histograma mediilor, n = 1", xlab = "Medii", col = "lightblue", breaks = 20)
-  
-  hist(CLT_binom(5, 20, 0.5), main = "Histograma mediilor, n = 5", xlab = "Medii", col = "lightgreen", breaks = 20)
-  
-  hist(CLT_binom(10, 20, 0.5), main = "Histograma mediilor, n = 10", xlab = "Medii", col = "lightcoral", breaks = 20)
-  
-  hist(CLT_binom(100, 20, 0.5), main = "Histograma mediilor, n = 100", xlab = "Medii", col = "lightgoldenrod", breaks = 20)
+  hist(CLT_binom(1), main = "Mean Histogram, n = 1", xlab = "Means", col = "lightblue", breaks = 20)
+  hist(CLT_binom(5), main = "Mean Histogram, n = 5", xlab = "Means", col = "lightgreen", breaks = 20)
+  hist(CLT_binom(10), main = "Mean Histogram, n = 10", xlab = "Means", col = "lightcoral", breaks = 20)
+  hist(CLT_binom(100), main = "Mean Histogram, n = 100", xlab = "Means", col = "lightgoldenrod", breaks = 20)
 }
