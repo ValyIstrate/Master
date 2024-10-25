@@ -17,7 +17,7 @@ ex2 = function(n) {
     
     y = dbinom(x, size = n, prob = p)
     
-    plot(x, y, type = "h", col = "blue", lwd = 2, 
+    plot(x, y, type = "h", col = "red", lwd = 2, 
          main = paste("D-Binom B(", n, ",", p, ")"),
          xlab = "Values of X", ylab = "Prob")
     
