@@ -42,7 +42,7 @@ ex2 = function() {
   abline(reg_line, col = "red", lwd = 2)
   
   # From the course: Yi = α + βXi + εi
-  # Found 2 ways to do this
+  # Found 2 ways to do this (one was using the R method called predict)
   summary(reg_line)
   intercept = coef(reg_line)[1]
   coef_IQ = coef(reg_line)[2]
@@ -101,7 +101,7 @@ use_fun_ex4 = function() {
   fun_ex4(obs)
 }
 
-print_results = function(case_idx, generated_data) {
+print_results = function(idx, results) {
   cat("Case", idx, ":\n")
   cat("Coef a (INTERCEPT) est.:", round(results$a_hat, 3), "\n")
   cat("Coef b est.:", round(results$b_hat, 3), "\n")
@@ -111,7 +111,7 @@ print_results = function(case_idx, generated_data) {
       "-", round(results$intervals_b[2], 3), "\n\n")
 }
 
-generate_and_save_pdf = function(case_idx, a, b, generated_data) {
+generate_and_save_pdf = function(idx, a, b, generated_data) {
   pdf_file_name = paste0("output_graph_case_", idx, ".pdf")
   pdf(pdf_file_name)
   
@@ -123,7 +123,7 @@ generate_and_save_pdf = function(case_idx, a, b, generated_data) {
   
   reg_line = lm(y ~ x, data = generated_data)
   abline(reg_line, col = "red", lwd = 2)
-  abline(a, b, col = "green", lwd = 2, lty = 2)
+  abline(a, b, col = "green", lwd = 2, lty = "dashed")
   
   legend("topright", legend = c("Obs", "Estimation", "Real Model"), 
          col = c("blue", "red", "green"), pch = c(16, NA, NA), lty = c(NA, 1, 2))
@@ -146,5 +146,6 @@ ex5 = function() {
                              sigma_values[idx])
     results = fun_ex4(generated_data)
     print_results(idx, results)
+    generate_and_save_pdf(idx, a, b, generated_data)
   }
 }
