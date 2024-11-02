@@ -1,21 +1,21 @@
 model:
-  name: "mlp"
+  name: resnet18_cifar10
   num_classes: 10
 
 dataset:
-  name: "MNIST"
+  name: "CIFAR10"
   path: "./data"
   batch_size: 64
   num_workers: 4
-  augmentation: "basic"
+  augmentation: None
   pin_memory: true
 
 training:
   device: "cuda"
   epochs: 1
   early_stopping: 5
-  optimizer: "Adam"
-  learning_rate: 0.001
+  optimizer: "SGD"
+  learning_rate: 0.1
   scheduler: "StepLR"
   scheduler_params:
     step_size: 10

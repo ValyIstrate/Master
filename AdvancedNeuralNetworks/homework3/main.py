@@ -4,30 +4,7 @@ import torch
 from trainer.trainer import Trainer
 from data.dataset import get_dataloader
 from model.model_loader import load_model
-from utils.log import simple_text, info, warn
-from torcheval.metrics.functional import multiclass_accuracy
-from torcheval.metrics.functional import multiclass_f1_score
-
-
-def write_data_set_scores(prediction: torch.Tensor, labels):
-    prediction = torch.tensor(prediction) if not isinstance(prediction, torch.Tensor) else prediction
-    labels = torch.tensor(labels) if not isinstance(labels, torch.Tensor) else labels
-
-    accuracy = multiclass_accuracy(prediction, labels)
-    f1_score = multiclass_f1_score(prediction, labels)
-
-    simple_text(f"Accuracy: {accuracy}")
-    simple_text(f"F1-Score: {f1_score}")
-
-    simple_text("All Classes Accuracy:")
-    class_accuracies = multiclass_accuracy(prediction, labels, average=None, num_classes=10)
-    for cls, value in enumerate(class_accuracies):
-        simple_text(f"    Class {cls}: {value}")
-
-    simple_text("All Classes F1-Score:")
-    class_f1_scores = multiclass_f1_score(prediction, labels, average=None, num_classes=10)
-    for cls, value in enumerate(class_f1_scores):
-        simple_text(f"    Class {cls}: {value}")
+from utils.log import info, warn
 
 
 def load_config(config_path):
@@ -65,11 +42,7 @@ def main():
     train_loader, val_loader = get_dataloader(config)
     trainer = Trainer(model, train_loader, val_loader, config, device)
 
-    # trainer.train_loop()
-    trainer.train()
-
-    # predictions, labels = trainer.get_final_predictions(val_loader)
-    # write_data_set_scores(predictions, labels)
+    trainer.train_loop()
 
 if __name__ == "__main__":
     main()
