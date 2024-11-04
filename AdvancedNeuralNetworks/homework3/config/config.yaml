@@ -1,0 +1,28 @@
+model:
+  name: resnet18_cifar10
+  num_classes: 10
+
+dataset:
+  name: "CIFAR10"
+  path: "./data"
+  batch_size: 64
+  num_workers: 4
+  augmentation: None
+  pin_memory: true
+
+training:
+  device: "cuda"
+  epochs: 1
+  early_stopping: 5
+  optimizer: "SGD"
+  learning_rate: 0.1
+  scheduler: "StepLR"
+  scheduler_params:
+    step_size: 10
+    gamma: 0.1
+
+logging:
+  tensorboard_log_dir: "runs/tensorboard"
+  wandb_project_name: "Training Pipeline"
+  use_tensorboard: true
+  use_wandb: true
