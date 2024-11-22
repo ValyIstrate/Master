@@ -1,30 +1,24 @@
 import cv2
 import numpy as np
+from skimage.util import random_noise
 
 
-def gaussian_noise(image):
-    row, col = image.shape
-    mean = 0
-    sigma = 10
-    gauss = np.random.normal(mean, sigma, (row, col)).reshape(row, col)
+def gaussian_noise(image, mean=0, sigma=20):
+    image = image.astype(np.float32)
+    gauss = np.random.normal(mean, sigma, image.shape)
     noisy = image + gauss
+    noisy = np.clip(noisy, 0, 255)
+    noisy_image = noisy.astype(np.uint8)
     res = 'noisy_gaussian.jpg'
-    cv2.imwrite(res, noisy)
+    cv2.imwrite(res, noisy_image)
     return res
 
 
 def salt_pepper_noise(image):
-    prob = 0.05
-    noisy = np.copy(image)
-    for i in range(image.shape[0]):
-        for j in range(image.shape[1]):
-            rdn = np.random.rand()
-            if rdn < prob:
-                noisy[i][j] = 0
-            elif rdn > 1 - prob:
-                noisy[i][j] = 255
+    noise_img = random_noise(image, mode='s&p', amount=0.3)
+    noise_img = np.array(255 * noise_img, dtype='uint8')
     res = 'noisy_salt_pepper.jpg'
-    cv2.imwrite(res, noisy)
+    cv2.imwrite(res, noise_img)
     return res
 
 
