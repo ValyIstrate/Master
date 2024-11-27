@@ -3,6 +3,7 @@ import pytesseract
 from add_noise import *
 from enhancements import sharpen_image, apply_erosion, apply_dilation, apply_opening, apply_closing, \
     apply_global_threshold, apply_adaptive_threshold
+from transformations import apply_gaussian_filter, apply_average_filter
 import re
 from difflib import SequenceMatcher
 from PIL import Image
@@ -26,8 +27,9 @@ class ReceiptReader:
             # "global_threshold": apply_global_threshold(image_path, threshold_value=128), # could be better
             # "adaptive_threshold": apply_adaptive_threshold(image_path, block_size=11, c_value=2), # not good
             # "open_sharpen": preprocess_receipt_open_sharpen(image_path), # decent enough
-            "erode_dilate": preprocess_receipt_erosion_dilation(image_path), # best so far
-            "erode_threshold": preprocess_receipt_erode_threshold(image_path) # bad
+            # "erode_dilate": preprocess_receipt_erosion_dilation(image_path), # best so far
+            # "erode_threshold": preprocess_receipt_erode_threshold(image_path), # bad
+            "gaussian_filter": preprocess_apply_gaussian_filter(image_path)
         }
 
     def apply_image_enhancements_and_extract_text(self):
@@ -75,6 +77,13 @@ def preprocess_receipt_erode_threshold(image_path, output_dir="receipt_reader_re
     eroded = apply_erosion(image_path, kernel_size=3)
     thresholded = apply_global_threshold(eroded, 128)
     return thresholded
+
+
+def preprocess_apply_gaussian_filter(image_path, output_dir="receipt_reader_results"):
+    os.makedirs(output_dir, exist_ok=True)
+    thresholded = apply_global_threshold(image_path, threshold_value=128)
+    gauss = apply_gaussian_filter(thresholded, sigma=2)
+    return gauss
 
 
 def normalize_text(text: str):
