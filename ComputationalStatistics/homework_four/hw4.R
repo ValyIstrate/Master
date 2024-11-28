@@ -1,94 +1,80 @@
-library(ggplot2)
-
-ex1 = function() {
-  file_path = "house.dat"
+ex1_plots = function(results_df) {
+  results_df$Subset_Size = sapply(strsplit(results_df$Variables, ","), length)
+  avg_metrics = aggregate(. ~ Subset_Size, data = results_df[, c("Subset_Size", "RSS", "R2", "Adj_R2", "Cp")], mean)
   
-  table_data = read.table(file_path, header = TRUE,
-                          sep = "", stringsAsFactors = FALSE)
+  par(mfrow = c(2, 2))
   
-  all_vars = names(table_data)[-1]
-  n_vars = length(all_vars)
+  plot(avg_metrics$Subset_Size, avg_metrics$RSS, type = "b", pch = 19, col = "red",
+       main = "RSS by Subset Size", xlab = "Subset Size", ylab = "RSS", lwd = 2)
   
-  best_models = list()
-  all_criteria = data.frame(Dimension = integer(), RSS = numeric(),
-                            R2 = numeric(), Adj_R2 = numeric(), Cp = numeric())
+  plot(avg_metrics$Subset_Size, avg_metrics$R2, type = "b", pch = 19, col = "red",
+       main = "R2 by Subset Size", xlab = "Subset Size", ylab = "R2", lwd = 2)
   
-  for (p in 1:n_vars) {
-    subsets <- combn(all_vars, p, simplify = FALSE)
-    metrics_list <- list()
-    
-    for (subset in subsets) {
-      metrics <- compute_metrics(table_data, subset, all_vars)
-      metrics_list <- append(metrics_list,
-                             list(c(vars = paste(subset, collapse = ","), metrics)))
-    }
-    
-    results_df <- do.call(rbind, lapply(metrics_list, function(x) {
-      data.frame(vars = x[1], RSS = as.numeric(x[2]),
-                 R2 = as.numeric(x[3]), Adj_R2 = as.numeric(x[4]),
-                 Cp = as.numeric(x[5]))
-    }))
-    
-    best_models[[p]] <- list(
-      best_rss = results_df[which.min(results_df$RSS), ],
-      best_r2 = results_df[which.max(results_df$R2), ],
-      best_adj_r2 = results_df[which.max(results_df$Adj_R2), ],
-      best_cp = results_df[which.min(results_df$Cp), ]
-    )
-    
-    all_criteria <- rbind(all_criteria,
-                          data.frame(Dimension = p,
-                                     RSS = min(results_df$RSS),
-                                     R2 = max(results_df$R2),
-                                     Adj_R2 = max(results_df$Adj_R2),
-                                     Cp = min(results_df$Cp)))
-  }
+  plot(avg_metrics$Subset_Size, avg_metrics$Adj_R2, type = "b", pch = 19, col = "red",
+       main = "Adj R2 by Subset Size", xlab = "Subset Size", ylab = "Adj R2", lwd = 2)
   
-
-  generate_plots(all_criteria)
-  
-  best_overall = do.call(rbind, lapply(best_models, function(x) x$best_adj_r2))
-  best_model = best_overall[which.max(best_overall$Adj_R2), ]
-  
-  print("Best Model WRT Adj_R2:")
-  print(best_model)
+  plot(avg_metrics$Subset_Size, avg_metrics$Cp, type = "b", pch = 19, col = "red",
+       main = "Cp by Subset Size", xlab = "Subset Size", ylab = "Cp", lwd = 2)
 }
 
-compute_metrics = function(table_data, subset_vars, all_vars) {
+compute_metrics = function(table_data, subset_vars) {
   formula = as.formula(paste("PRICE ~", paste(subset_vars, collapse = " + ")))
   model = lm(formula, data = table_data)
   
-  rss = sum(residuals(model) ^ 2)
-  
-  tss = sum((table_data$PRICE - mean(table_data$PRICE)) ^ 2)
-  
+  rss = sum(residuals(model)^2)
+  tss = sum((table_data$PRICE - mean(table_data$PRICE))^2)
   r2 = 1 - (rss / tss)
-  adj_r2 <- 1 - ((1 - r2) * (nrow(table_data) - 1) / (nrow(table_data) - length(subset_vars) - 1))
+  adj_r2 = 1 - ((1 - r2) * (nrow(table_data) - 1) / (nrow(table_data) - length(subset_vars) - 1))
   
-  sigma2 = sum(residuals(lm(PRICE ~ ., data = table_data)) ^ 2) / (nrow(table_data) - length(all_vars) - 1)
+  full_model = lm(PRICE ~ ., data = table_data)
+  sigma2 = sum(residuals(full_model)^2) / (nrow(table_data) - ncol(table_data))
   cp = rss / sigma2 - nrow(table_data) + 2 * length(subset_vars)
   
   return(c(rss = rss, r2 = r2, adj_r2 = adj_r2, cp = cp))
 }
 
-generate_plots = function(criteria_data) {
-  ggplot(criteria_data, aes(x = Dimension, y = RSS)) +
-    geom_line() + geom_point() +
-    ggtitle("RSS WRT Model Dimension") +
-    xlab("Model Dimensioni") + ylab("RSS")
+ex1_manual = function() {
+  file_path = "house.dat"
+  table_data = read.table(file_path, header = TRUE, sep = "", stringsAsFactors = FALSE)
+  all_vars = names(table_data)[-1]  
+  n_vars = length(all_vars)
   
-  ggplot(criteria_data, aes(x = Dimension, y = R2)) +
-    geom_line() + geom_point() +
-    ggtitle("R2 WRT Model Dimension") +
-    xlab("Model Dimension") + ylab("R2")
+  results = list()
   
-  ggplot(criteria_data, aes(x = Dimension, y = Adj_R2)) +
-    geom_line() + geom_point() +
-    ggtitle("Adj_R2 WT Model Dimension") +
-    xlab("Model Dimension") + ylab("Adj_R2")
+  for (p in 1:n_vars) {
+    subsets = combn(all_vars, p, simplify = FALSE)  
+    for (subset in subsets) {
+      metrics = compute_metrics(table_data, subset)
+      results = append(results, list(
+        list(
+          vars = paste(subset, collapse = ","),
+          subset_size = p,
+          rss = metrics["rss"],
+          r2 = metrics["r2"],
+          adj_r2 = metrics["adj_r2"],
+          cp = metrics["cp"]
+        )
+      ))
+    }
+  }
   
-  ggplot(criteria_data, aes(x = Dimension, y = Cp)) +
-    geom_line() + geom_point() +
-    ggtitle("CP WRT Model Dimension") +
-    xlab("Model Dimension") + ylab("CP")
+  results_df = do.call(rbind, lapply(results, function(x) {
+    data.frame(
+      Variables = x$vars,
+      Subset_Size = as.numeric(x$subset_size),
+      RSS = as.numeric(x$rss),
+      R2 = as.numeric(x$r2),
+      Adj_R2 = as.numeric(x$adj_r2),
+      Cp = as.numeric(x$cp)
+    )
+  }))
+  
+  best_model = results_df[which.max(results_df$Adj_R2), ]
+  
+  print("Best model:")
+  print(best_model)
+  
+  results = (list(results_df = results_df, best_model = best_model))
+  ex1_plots(results$results_df)
+  results
 }
