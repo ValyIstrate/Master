@@ -28,7 +28,7 @@ compute_metrics = function(table_data, subset_vars) {
   
   full_model = lm(PRICE ~ ., data = table_data)
   sigma2 = sum(residuals(full_model)^2) / (nrow(table_data) - ncol(table_data))
-  cp = rss / sigma2 - nrow(table_data) + 2 * length(subset_vars)
+  cp = rss / sigma2 - nrow(table_data) + 2 * (length(subset_vars) + 1)
   
   return(c(rss = rss, r2 = r2, adj_r2 = adj_r2, cp = cp))
 }
@@ -69,12 +69,33 @@ ex1_manual = function() {
     )
   }))
   
-  best_model = results_df[which.max(results_df$Adj_R2), ]
+  best_model_rss = results_df[which.min(results_df$RSS), ]
+  best_model_r2 = results_df[which.max(results_df$R2), ]
+  best_model_adj_r2 = results_df[which.max(results_df$Adj_R2), ]
+  best_model_cp = results_df[which.min(results_df$Cp), ]
   
-  print("Best model:")
-  print(best_model)
+  print("Best model (RSS): ")
+  print(best_model_rss)
   
-  results = (list(results_df = results_df, best_model = best_model))
+  print("Best model (R2): ")
+  print(best_model_r2)
+  
+  print("Best model (ADJ_R2): ")
+  print(best_model_adj_r2)
+  
+  print("Best model (CP): ")
+  print(best_model_cp)
+
+  variables_rss = unlist(strsplit(as.character(best_model_rss$Variables), ","))
+  variables_r2 = unlist(strsplit(as.character(best_model_r2$Variables), ","))
+  variables_adj_r2 = unlist(strsplit(as.character(best_model_adj_r2$Variables), ","))
+  variables_cp = unlist(strsplit(as.character(best_model_cp$Variables), ","))
+  
+  common_variables = Reduce(intersect, list(variables_rss, variables_r2, variables_adj_r2, variables_cp))
+  cat("\nBest model:\n")
+  print(common_variables)
+  
+  results = (list(results_df = results_df, best_model = best_model_adj_r2))
   ex1_plots(results$results_df)
   results
 }
